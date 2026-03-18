@@ -373,18 +373,75 @@ function applyTapAnim(el){const a=S.settings.tapAnim;if(a==='scale'){el.style.tr
 function showWidgetMenu(wd,el){if(S.settings.vibrate)try{navigator.vibrate(50)}catch(_){}const rect=el.getBoundingClientRect();buildCtxMenu([{icon:'&#9999;',label:'Edit',action:()=>openWidgetEditor(wd)},{icon:'&#8597;',label:'Move',action:()=>{enterEditMode();DRAG_STATE={type:'move',wid:wd.id,wDef:{...wd},startTouch:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}}}},{icon:'&#8596;',label:'Resize',action:()=>{enterEditMode();DRAG_STATE={type:'resize',wid:wd.id,wDef:{...wd},startTouch:{x:rect.right,y:rect.bottom}}}},{sep:true},{icon:'&#128274;',label:'Lock',action:()=>toggleLock(wd)},{sep:true},{icon:'&#128465;',label:'Remove',danger:true,action:()=>removeWidget(wd)}],rect.left,rect.bottom+8)}
 function showPageMenu(){if(S.settings.vibrate)try{navigator.vibrate(50)}catch(_){}buildCtxMenu([{icon:'&#128196;',label:'Add page',action:()=>openPageModal()},{icon:'&#9999;',label:'Rename page',action:()=>renamePage()},{icon:'&#128203;',label:'Duplicate page',action:()=>duplicatePage()},{icon:'&#11088;',label:'Set as home',action:()=>setHome()},{sep:true},{icon:EDIT_MODE?'&#10003;':'&#8862;',label:EDIT_MODE?'Done editing':'Edit layout',accent:true,action:()=>EDIT_MODE?exitEditMode():enterEditMode()},{sep:true},{icon:'&#128465;',label:'Delete page',danger:true,action:()=>deletePage()}],window.innerWidth/2-90,window.innerHeight/2-80)}
 const ctxMenu=document.getElementById('ctx-menu');
-function buildCtxMenu(items,x,y){ctxMenu.innerHTML='';for(const item of items){if(item.sep){const s=document.createElement('div');s.className='ctx-sep';ctxMenu.appendChild(s);continue}const d=document.createElement('div');d.className='ctx-item'+(item.danger?' danger':'')+(item.accent?' accent':'');d.innerHTML=`<span class="ctx-icon">${item.icon}</span>${item.label}`;d.addEventListener('touchend',e=>{e.stopPropagation();hideCtxMenu();setTimeout(()=>item.action(),80)},{passive:true});ctxMenu.appendChild(d)}const mW=190;const sx=Math.min(x,window.innerWidth-mW-10);const sy=Math.min(y,window.innerHeight-items.length*46-20);ctxMenu.style.cssText=`left:${Math.max(10,sx)}px;top:${Math.max(10,sy)}px`;ctxMenu.classList.add('vis')}
+function buildCtxMenu(items,x,y){_ctxOpenedAt=Date.now();ctxMenu.innerHTML='';for(const item of items){if(item.sep){const s=document.createElement('div');s.className='ctx-sep';ctxMenu.appendChild(s);continue}const d=document.createElement('div');d.className='ctx-item'+(item.danger?' danger':'')+(item.accent?' accent':'');d.innerHTML=`<span class="ctx-icon">${item.icon}</span>${item.label}`;d.addEventListener('touchend',e=>{e.stopPropagation();hideCtxMenu();setTimeout(()=>item.action(),80)},{passive:true});ctxMenu.appendChild(d)}const mW=190;const sx=Math.min(x,window.innerWidth-mW-10);const sy=Math.min(y,window.innerHeight-items.length*46-20);ctxMenu.style.cssText=`left:${Math.max(10,sx)}px;top:${Math.max(10,sy)}px`;ctxMenu.classList.add('vis')}
 function hideCtxMenu(){ctxMenu.classList.remove('vis')}
-document.addEventListener('touchend',e=>{if(!ctxMenu.contains(e.target))hideCtxMenu()},{passive:true});
+let _ctxOpenedAt=0;
+document.addEventListener('touchstart',e=>{if(ctxMenu.classList.contains('vis')&&!ctxMenu.contains(e.target)&&Date.now()-_ctxOpenedAt>350)hideCtxMenu()},{passive:true});
 const editToolbar=document.getElementById('edit-toolbar');
 function enterEditMode(){EDIT_MODE=true;editToolbar.classList.add('vis');if(PAGE_ELS[S.currentPage])PAGE_ELS[S.currentPage].classList.add('editing');renderAllPages()}
 function exitEditMode(){EDIT_MODE=false;editToolbar.classList.remove('vis');Object.values(PAGE_ELS).forEach(e=>e.classList.remove('editing'));renderAllPages()}
 document.getElementById('etb-done').addEventListener('click',()=>exitEditMode());
 document.getElementById('etb-add').addEventListener('click',()=>openAddPicker());
 document.getElementById('etb-page').addEventListener('click',()=>openPageModal());
-function handleDragMove(touch){if(!DRAG_STATE)return;const dx=touch.clientX-DRAG_STATE.startTouch.x,dy=touch.clientY-DRAG_STATE.startTouch.y;const{cw,ch}=cellSize();const g=gridCfg();if(DRAG_STATE.type==='move'&&GHOST_EL){const orig=gridToPixel(DRAG_STATE.wDef.col,DRAG_STATE.wDef.row,DRAG_STATE.wDef.colSpan,DRAG_STATE.wDef.rowSpan);const{col,row}=pixelToGrid(orig.x+dx+cw/2,orig.y+dy+ch/2);DRAG_STATE._snapCol=Math.min(col,g.cols-DRAG_STATE.wDef.colSpan);DRAG_STATE._snapRow=Math.min(row,g.rows-DRAG_STATE.wDef.rowSpan);const snapped=gridToPixel(DRAG_STATE._snapCol,DRAG_STATE._snapRow,DRAG_STATE.wDef.colSpan,DRAG_STATE.wDef.rowSpan);GHOST_EL.style.left=snapped.x+'px';GHOST_EL.style.top=snapped.y+'px'}else if(DRAG_STATE.type==='resize'){DRAG_STATE._newCs=Math.max(1,Math.min(g.cols-DRAG_STATE.wDef.col,DRAG_STATE.wDef.colSpan+Math.round(dx/cw)));DRAG_STATE._newRs=Math.max(1,Math.min(g.rows-DRAG_STATE.wDef.row,DRAG_STATE.wDef.rowSpan+Math.round(dy/ch)))}}
-document.addEventListener('touchstart',e=>{if(!DRAG_STATE||DRAG_STATE.type!=='move')return;const pageEl=PAGE_ELS[S.currentPage];if(!pageEl)return;const wd=S.pages[S.currentPage]?.widgets.find(w=>w.id===DRAG_STATE.wid);if(!wd)return;const rect=gridToPixel(wd.col,wd.row,wd.colSpan,wd.rowSpan);if(GHOST_EL)GHOST_EL.remove();GHOST_EL=document.createElement('div');GHOST_EL.className='drag-ghost';GHOST_EL.style.cssText=`left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px`;pageEl.appendChild(GHOST_EL)},{passive:true});
-document.addEventListener('touchend',()=>{if(!DRAG_STATE)return;const pg=S.pages[S.currentPage];if(pg){const w=pg.widgets.find(w=>w.id===DRAG_STATE.wid);if(w){if(DRAG_STATE.type==='move'){if(DRAG_STATE._snapCol!==undefined)w.col=DRAG_STATE._snapCol;if(DRAG_STATE._snapRow!==undefined)w.row=DRAG_STATE._snapRow}else if(DRAG_STATE.type==='resize'){if(DRAG_STATE._newCs!==undefined)w.colSpan=DRAG_STATE._newCs;if(DRAG_STATE._newRs!==undefined)w.rowSpan=DRAG_STATE._newRs}saveState();renderAllPages()}}if(GHOST_EL){GHOST_EL.remove();GHOST_EL=null}DRAG_STATE=null},{passive:true});
+function handleDragMove(touch){
+  if(!DRAG_STATE)return;
+  const dx=touch.clientX-DRAG_STATE.startTouch.x,dy=touch.clientY-DRAG_STATE.startTouch.y;
+  const{cw,ch}=cellSize();const g=gridCfg();
+  if(DRAG_STATE.type==='move'&&GHOST_EL){
+    const orig=gridToPixel(DRAG_STATE.wDef.col,DRAG_STATE.wDef.row,DRAG_STATE.wDef.colSpan,DRAG_STATE.wDef.rowSpan);
+    const{col,row}=pixelToGrid(orig.x+dx+cw/2,orig.y+dy+ch/2);
+    DRAG_STATE._snapCol=Math.min(col,g.cols-DRAG_STATE.wDef.colSpan);
+    DRAG_STATE._snapRow=Math.min(row,g.rows-DRAG_STATE.wDef.rowSpan);
+    const snapped=gridToPixel(DRAG_STATE._snapCol,DRAG_STATE._snapRow,DRAG_STATE.wDef.colSpan,DRAG_STATE.wDef.rowSpan);
+    GHOST_EL.style.left=snapped.x+'px';GHOST_EL.style.top=snapped.y+'px';
+  }else if(DRAG_STATE.type==='resize'){
+    const ncs=Math.max(1,Math.min(g.cols-DRAG_STATE.wDef.col,DRAG_STATE.wDef.colSpan+Math.round(dx/cw)));
+    const nrs=Math.max(1,Math.min(g.rows-DRAG_STATE.wDef.row,DRAG_STATE.wDef.rowSpan+Math.round(dy/ch)));
+    DRAG_STATE._newCs=ncs;DRAG_STATE._newRs=nrs;
+    // Live update widget element size for immediate visual feedback
+    const pageEl=PAGE_ELS[S.currentPage];
+    if(pageEl){
+      const wEl=pageEl.querySelector(`[data-wid="${DRAG_STATE.wid}"]`);
+      if(wEl){
+        const r=gridToPixel(DRAG_STATE.wDef.col,DRAG_STATE.wDef.row,ncs,nrs);
+        wEl.style.width=r.w+'px';wEl.style.height=r.h+'px';
+        wEl.style.boxShadow='0 0 0 2px var(--accent-border),0 0 20px var(--accent-glow)';
+      }
+    }
+  }
+}
+// Wire document touchmove for resize (resize handle stopPropagation prevents widget's own listener)
+document.addEventListener('touchmove',e=>{
+  if(DRAG_STATE&&DRAG_STATE.type==='resize')handleDragMove(e.touches[0]);
+},{passive:true});
+// Wire document touchmove for move drag and ghost creation
+document.addEventListener('touchstart',e=>{
+  if(!DRAG_STATE||DRAG_STATE.type!=='move')return;
+  const pageEl=PAGE_ELS[S.currentPage];if(!pageEl)return;
+  const wd=S.pages[S.currentPage]?.widgets.find(w=>w.id===DRAG_STATE.wid);if(!wd)return;
+  const rect=gridToPixel(wd.col,wd.row,wd.colSpan,wd.rowSpan);
+  if(GHOST_EL)GHOST_EL.remove();
+  GHOST_EL=document.createElement('div');GHOST_EL.className='drag-ghost';
+  GHOST_EL.style.cssText=`left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px`;
+  pageEl.appendChild(GHOST_EL);
+  // Dim the source widget
+  const wEl=pageEl.querySelector(`[data-wid="${DRAG_STATE.wid}"]`);
+  if(wEl)wEl.style.opacity='.35';
+},{passive:true});
+document.addEventListener('touchend',()=>{
+  if(!DRAG_STATE)return;
+  const pg=S.pages[S.currentPage];
+  if(pg){
+    const w=pg.widgets.find(w=>w.id===DRAG_STATE.wid);
+    if(w){
+      if(DRAG_STATE.type==='move'){if(DRAG_STATE._snapCol!==undefined)w.col=DRAG_STATE._snapCol;if(DRAG_STATE._snapRow!==undefined)w.row=DRAG_STATE._snapRow}
+      else if(DRAG_STATE.type==='resize'){if(DRAG_STATE._newCs!==undefined)w.colSpan=DRAG_STATE._newCs;if(DRAG_STATE._newRs!==undefined)w.rowSpan=DRAG_STATE._newRs}
+      saveState();renderAllPages();
+    }
+  }
+  if(GHOST_EL){GHOST_EL.remove();GHOST_EL=null}
+  DRAG_STATE=null;
+},{passive:true});
 const WIDGET_TYPES=[{type:'clock',icon:'&#128336;',name:'Clock',desc:'Time and date display',defaultSize:[4,3]},{type:'weather',icon:'&#127780;',name:'Weather',desc:'Temperature and forecast',defaultSize:[4,4]},{type:'stat-cpu',icon:'&#128187;',name:'CPU',desc:'Processor usage and temp',defaultSize:[3,3]},{type:'stat-ram',icon:'&#129504;',name:'RAM',desc:'Memory usage',defaultSize:[3,3]},{type:'stat-gpu',icon:'&#127918;',name:'GPU',desc:'Graphics card stats',defaultSize:[3,3]},{type:'stat-net',icon:'&#128246;',name:'Network',desc:'Download and upload speed',defaultSize:[3,2]},{type:'gif',icon:'&#127902;',name:'GIF',desc:'Animated image display',defaultSize:[6,5]},{type:'music',icon:'&#127925;',name:'Music',desc:'MusicBee player controls',defaultSize:[6,4]},{type:'macro',icon:'&#9654;',name:'Macro Button',desc:'Single action button',defaultSize:[2,2]}];
 const addPicker=document.getElementById('add-picker'),apGrid=document.getElementById('ap-grid');
 function openAddPicker(){apGrid.innerHTML='';for(const wt of WIDGET_TYPES){const item=document.createElement('div');item.className='ap-item';item.innerHTML=`<div class="ap-icon">${wt.icon}</div><div class="ap-name">${wt.name}</div><div class="ap-desc">${wt.desc}</div>`;item.addEventListener('touchend',e=>{e.stopPropagation();addPicker.classList.remove('vis');addWidget(wt)},{passive:true});apGrid.appendChild(item)}addPicker.classList.add('vis')}
