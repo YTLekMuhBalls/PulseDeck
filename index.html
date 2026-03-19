@@ -42,12 +42,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;
   background-size:var(--unit) var(--unit)}
 .pd-page.editing .grid-overlay{opacity:1}
 /* Widgets */
-.pd-widget{position:absolute;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;transition:box-shadow .15s;z-index:10}
+.pd-widget{position:absolute;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;transition:box-shadow .15s;z-index:10;contain:layout}
 .pd-widget.selected{border-color:var(--accent-border);box-shadow:0 0 0 1px var(--accent-border),0 0 20px var(--accent-glow);z-index:20}
-.pd-widget.shape-squircle{border-radius:28%}
+.pd-widget.shape-squircle{border-radius:min(28%,50%)}
 .pd-widget.shape-pill{border-radius:999px}
 .pd-widget.shape-sharp{border-radius:0}
-.pd-widget.shape-soft{border-radius:20px}
+.pd-widget.shape-soft{border-radius:min(20px,50%)}
 .widget-inner{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
 .drag-ghost{position:absolute;background:var(--accent-dim);border:2px dashed var(--accent-border);border-radius:var(--r);z-index:50;pointer-events:none;transition:none}
 .resize-handle{position:absolute;bottom:0;right:0;width:28px;height:28px;z-index:30;cursor:se-resize;touch-action:none;background:linear-gradient(135deg,transparent 50%,var(--accent-border) 50%);border-radius:0 0 var(--r) 0}
@@ -81,8 +81,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;
 .etb-btn:active{background:var(--s4)}
 .etb-btn.primary{color:var(--accent);border-color:var(--accent-border);background:var(--accent-dim)}
 /* Wiggle animation for edit mode */
-@keyframes wiggle{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-1.5deg)}40%{transform:rotate(1.5deg)}60%{transform:rotate(-1deg)}80%{transform:rotate(1deg)}}
-.pd-widget.edit-wiggle{animation:wiggle .45s ease-in-out infinite}
+@keyframes wiggle{0%,100%{transform:rotate(0deg)}15%{transform:rotate(-.8deg)}35%{transform:rotate(.8deg)}55%{transform:rotate(-.6deg)}75%{transform:rotate(.6deg)}90%{transform:rotate(-.3deg)}}
+.pd-widget.edit-wiggle{animation:wiggle 1.8s ease-in-out infinite;transform-origin:center}
 /* 8-point resize handles */
 .rh{position:absolute;z-index:35;touch-action:none;-webkit-tap-highlight-color:transparent}
 .rh::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent-glow),0 0 0 2px rgba(0,0,0,.8);opacity:.9}
@@ -159,9 +159,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;
 .ss-slider-hdr{display:flex;justify-content:space-between;margin-bottom:8px}
 .ss-slider-lbl{font-size:11px;color:var(--ts)}
 .ss-slider-val{font-family:var(--mono);font-size:11px;color:var(--accent)}
-input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--s4);border-radius:2px;outline:none;cursor:pointer;accent-color:var(--accent)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent-glow);transition:transform .1s}
-input[type=range]:active::-webkit-slider-thumb{transform:scale(1.3)}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--s4);border-radius:2px;outline:none;cursor:pointer;accent-color:var(--accent);touch-action:auto}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);border:none}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(.88)}
 .ss-slider-row{display:flex;align-items:center;gap:8px}
 .ss-slider-row input[type=range]{flex:1}
 .sl-reset{font-size:14px;color:var(--tm);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity .2s;-webkit-tap-highlight-color:transparent;padding:2px 4px}
@@ -231,10 +231,11 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.3)}
 .w-macro:active{transform:scale(.9)}
 .w-macro-icon{font-size:clamp(14px,4vw,28px);line-height:1;pointer-events:none;position:relative;z-index:1}
 .w-macro-label{font-size:clamp(6px,1.8vw,10px);letter-spacing:.04em;color:var(--td);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90%;pointer-events:none;position:relative;z-index:1}
-.w-stat{display:flex;flex-direction:column;justify-content:center;height:100%;padding:8px 10px;gap:2px}
+.w-stat{display:flex;flex-direction:column;justify-content:center;height:100%;padding:8px 10px;gap:2px;position:relative;overflow:hidden}
 .w-stat-label{font-size:7px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--tm)}
 .w-stat-val{font-family:var(--mono);font-size:clamp(14px,4vw,22px);font-weight:300;color:var(--txt);line-height:1}
 .w-stat-sub{font-family:var(--mono);font-size:8px;color:var(--tm)}
+.w-sparkline{position:absolute;bottom:0;left:0;right:0;height:35%;opacity:.35;pointer-events:none}
 .w-weather{display:flex;flex-direction:column;justify-content:center;height:100%;padding:10px 12px;gap:4px}
 .w-weather-temp{font-family:var(--mono);font-size:clamp(22px,6vw,48px);font-weight:300;color:var(--txt);line-height:1}
 .w-weather-desc{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--td)}
@@ -642,6 +643,33 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.3)}
     </div>
   </div>
 
+  <!-- Stat editor sheet -->
+  <div id="stat-editor-overlay" style="position:fixed;inset:0;z-index:8800;display:none">
+    <div id="stat-editor-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)"></div>
+    <div id="stat-editor-sheet" style="position:absolute;bottom:0;left:0;right:0;background:var(--s1);border-radius:22px 22px 0 0;border-top:1px solid var(--bdrs);display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)">
+      <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:12px auto 0;flex-shrink:0"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px 10px;flex-shrink:0;border-bottom:1px solid var(--bdr)">
+        <span style="font-size:14px;font-weight:600;letter-spacing:.06em" id="ste-title">Stat</span>
+        <div id="ste-close" style="width:28px;height:28px;border-radius:50%;background:var(--s3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--td);cursor:pointer">&#10005;</div>
+      </div>
+      <div style="padding:16px 18px 32px">
+        <div style="font-size:7.5px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--tm);margin-bottom:12px">Sparkline Style</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="ste-spark-chips">
+          <div class="ss-chip" data-sp="bars">Bars</div>
+          <div class="ss-chip" data-sp="dots">Dots</div>
+          <div class="ss-chip" data-sp="line">Line</div>
+          <div class="ss-chip" data-sp="gradient">Gradient fill</div>
+          <div class="ss-chip" data-sp="ekg">EKG</div>
+          <div class="ss-chip" data-sp="none">None</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <div id="ste-cancel" style="flex:1;padding:13px;border-radius:13px;text-align:center;font-size:11px;font-weight:600;background:var(--s3);border:1px solid var(--bdr);color:var(--td);cursor:pointer">Cancel</div>
+          <div id="ste-save" style="flex:2;padding:13px;border-radius:13px;text-align:center;font-size:11px;font-weight:600;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);cursor:pointer">Save</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Gradient picker -->
   <div id="grad-picker-overlay">
     <div id="grad-picker-sheet">
@@ -840,6 +868,8 @@ function renderAllPages(){
     renderWidgets(id);
   }
   positionWorld(false);updatePageIndicator();refreshLiveData();
+  // Draw sparklines after canvases are in DOM
+  requestAnimationFrame(drawSparklines);
 }
 function renderWidgets(pageId){const pg=AP().pages[pageId];if(!pg)return;const pageEl=PAGE_ELS[pageId];if(!pageEl)return;pageEl.querySelectorAll('.pd-widget').forEach(e=>e.remove());for(const w of pg.widgets){pageEl.appendChild(createWidgetEl(w))}}
 function createWidgetEl(wd){const rect=gridToPixel(wd.col,wd.row,wd.colSpan,wd.rowSpan);const el=document.createElement('div');el.className='pd-widget';el.dataset.wid=wd.id;if(wd.shape)el.classList.add('shape-'+wd.shape);el.style.cssText=`left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px;`;if(wd.borderRadius!==undefined)el.style.borderRadius=wd.borderRadius+'px';if(wd.bgColor)el.style.background=wd.bgColor;const inner=document.createElement('div');inner.className='widget-inner';inner.innerHTML=widgetContent(wd);el.appendChild(inner);if(EDIT_MODE){const rh=document.createElement('div');rh.className='resize-handle';rh.dataset.wid=wd.id;el.appendChild(rh);el.classList.add('selected')}attachTouch(el,wd);return el}
@@ -870,18 +900,42 @@ function widgetContent(wd){const demo=S.settings.demo;switch(wd.type){case'clock
     <div class="w-clock-time" id="wct-${wd.id}" style="font-family:${tFont};font-size:${tSize};font-weight:${tWeight};${tColorStyle};letter-spacing:-.03em;line-height:1;white-space:nowrap;text-align:${textAlign}">00:00</div>
     <div class="w-clock-date" id="wcd-${wd.id}" style="font-family:${dFont};font-size:${dSize};${dColorStyle};letter-spacing:.2em;text-transform:uppercase;text-align:${textAlign};${showDate?'':'display:none'}">&#8212;</div>
   </div>`;
-}case'macro':return`<div class="w-macro" data-wid="${wd.id}"><div class="w-macro-icon">${wd.icon||'&#9654;'}</div><div class="w-macro-label">${wd.label||''}</div></div>`;case'stat-cpu':return`<div class="w-stat"><div class="w-stat-label">CPU</div><div class="w-stat-val" id="ws-cpu-${wd.id}">${demo?Math.floor(Math.random()*40+20)+'%':'&#8212;'}</div><div class="w-stat-sub" id="wss-cpu-${wd.id}">${demo?(45+Math.floor(Math.random()*15))+'&deg;C':''}</div></div>`;case'stat-ram':return`<div class="w-stat"><div class="w-stat-label">RAM</div><div class="w-stat-val" id="ws-ram-${wd.id}">${demo?Math.floor(Math.random()*30+40)+'%':'&#8212;'}</div><div class="w-stat-sub" id="wss-ram-${wd.id}">${demo?'12.4 / 16 GB':''}</div></div>`;case'stat-gpu':return`<div class="w-stat"><div class="w-stat-label">GPU</div><div class="w-stat-val" id="ws-gpu-${wd.id}">${demo?Math.floor(Math.random()*50+10)+'%':'&#8212;'}</div><div class="w-stat-sub" id="wss-gpu-${wd.id}">${demo?(60+Math.floor(Math.random()*20))+'&deg;C':''}</div></div>`;case'stat-net':return`<div class="w-stat"><div class="w-stat-label">Network</div><div class="w-stat-val" style="font-size:clamp(10px,3vw,16px)" id="ws-net-${wd.id}">${demo?'&#8595; 24.3 MB/s':'&#8212;'}</div><div class="w-stat-sub" id="wss-net-${wd.id}">${demo?'&#8593; 3.1 MB/s':''}</div></div>`;case'weather':return`<div class="w-weather"><div class="w-weather-temp" id="ww-t-${wd.id}">${demo?'22&deg;':'&#8212;'}</div><div class="w-weather-desc" id="ww-desc-${wd.id}">${demo?'Partly cloudy':'&#8212;'}</div><div class="w-weather-loc" id="ww-loc-${wd.id}">${demo?'Sofia':'&#8212;'}</div></div>`;case'gif':return`<div class="w-gif"><div class="w-gif-ph"><span style="font-size:24px">&#127902;</span></div></div>`;case'music':return`<div class="w-music"><div class="w-music-title" id="wm-title-${wd.id}">${demo?'Nothing But Thieves':'&#8212;'}</div><div class="w-music-artist" id="wm-artist-${wd.id}">${demo?'Is Everybody Going Crazy?':''}</div><div class="w-music-controls"><div class="w-music-btn" data-cmd="previous">&#9664;&#9664;</div><div class="w-music-btn" data-cmd="play-pause" id="wm-pp-${wd.id}">&#9654;</div><div class="w-music-btn" data-cmd="next">&#9654;&#9654;</div></div></div>`;default:return`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--tm);font-size:10px;letter-spacing:.1em">${wd.type||'Widget'}</div>`}}
+}case'macro':return`<div class="w-macro" data-wid="${wd.id}"><div class="w-macro-icon">${wd.icon||'&#9654;'}</div><div class="w-macro-label">${wd.label||''}</div></div>`;
+case'stat-cpu':{const sp=wd.sparkStyle||'bars';return`<div class="w-stat"><div class="w-stat-label">CPU</div><div class="w-stat-val" id="ws-cpu-${wd.id}">${demo?Math.floor(Math.random()*40+20)+'%':'&#8212;'}</div><div class="w-stat-sub" id="wss-cpu-${wd.id}">${demo?(45+Math.floor(Math.random()*15))+'&deg;C':''}</div>${sp!=='none'?`<canvas class="w-sparkline" id="spark-cpu-${wd.id}" data-key="cpu" data-style="${sp}"></canvas>`:''}</div>`}
+case'stat-ram':{const sp=wd.sparkStyle||'bars';return`<div class="w-stat"><div class="w-stat-label">RAM</div><div class="w-stat-val" id="ws-ram-${wd.id}">${demo?Math.floor(Math.random()*30+40)+'%':'&#8212;'}</div><div class="w-stat-sub" id="wss-ram-${wd.id}">${demo?'12.4 / 16 GB':''}</div>${sp!=='none'?`<canvas class="w-sparkline" id="spark-ram-${wd.id}" data-key="ram" data-style="${sp}"></canvas>`:''}</div>`}
+case'stat-gpu':{const sp=wd.sparkStyle||'bars';return`<div class="w-stat"><div class="w-stat-label">GPU</div><div class="w-stat-val" id="ws-gpu-${wd.id}">${demo?Math.floor(Math.random()*50+10)+'%':'&#8212;'}</div><div class="w-stat-sub" id="wss-gpu-${wd.id}">${demo?(60+Math.floor(Math.random()*20))+'&deg;C':''}</div>${sp!=='none'?`<canvas class="w-sparkline" id="spark-gpu-${wd.id}" data-key="gpu" data-style="${sp}"></canvas>`:''}</div>`}
+case'stat-net':{const sp=wd.sparkStyle||'line';return`<div class="w-stat"><div class="w-stat-label">Network</div><div class="w-stat-val" style="font-size:clamp(10px,3vw,16px)" id="ws-net-${wd.id}">${demo?'&#8595; 24.3 MB/s':'&#8212;'}</div><div class="w-stat-sub" id="wss-net-${wd.id}">${demo?'&#8593; 3.1 MB/s':''}</div>${sp!=='none'?`<canvas class="w-sparkline" id="spark-net-${wd.id}" data-key="net" data-style="${sp}"></canvas>`:''}</div>`}case'weather':return`<div class="w-weather"><div class="w-weather-temp" id="ww-t-${wd.id}">${demo?'22&deg;':'&#8212;'}</div><div class="w-weather-desc" id="ww-desc-${wd.id}">${demo?'Partly cloudy':'&#8212;'}</div><div class="w-weather-loc" id="ww-loc-${wd.id}">${demo?'Sofia':'&#8212;'}</div></div>`;case'gif':return`<div class="w-gif"><div class="w-gif-ph"><span style="font-size:24px">&#127902;</span></div></div>`;case'music':return`<div class="w-music"><div class="w-music-title" id="wm-title-${wd.id}">${demo?'Nothing But Thieves':'&#8212;'}</div><div class="w-music-artist" id="wm-artist-${wd.id}">${demo?'Is Everybody Going Crazy?':''}</div><div class="w-music-controls"><div class="w-music-btn" data-cmd="previous">&#9664;&#9664;</div><div class="w-music-btn" data-cmd="play-pause" id="wm-pp-${wd.id}">&#9654;</div><div class="w-music-btn" data-cmd="next">&#9654;&#9654;</div></div></div>`;default:return`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--tm);font-size:10px;letter-spacing:.1em">${wd.type||'Widget'}</div>`}}
 function createWidgetEl(wd){
   const rect=gridToPixel(wd.col,wd.row,wd.colSpan,wd.rowSpan);
   const el=document.createElement('div');el.className='pd-widget';el.dataset.wid=wd.id;
   if(wd.shape&&wd.shape!=='default'&&wd.shape!=='custom')el.classList.add('shape-'+wd.shape);
   el.style.cssText=`left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px;`;
-  if(wd.borderRadius!==undefined&&wd.shape==='custom')el.style.borderRadius=wd.borderRadius+'px';
+  // Corner radius — clamp to half the shortest dimension so it never over-curves on small widgets
+  if(wd.shape==='custom'&&wd.borderRadius!==undefined){
+    const maxR=Math.min(rect.w,rect.h)/2;
+    el.style.borderRadius=Math.min(wd.borderRadius,maxR)+'px';
+  } else if(wd.shape==='default'||!wd.shape){
+    // Default shape — also clamp the default 12px radius
+    const maxR=Math.min(rect.w,rect.h)/2;
+    el.style.borderRadius=Math.min(12,maxR)+'px';
+  }
   if(wd.bgColor){
     const op=wd.bgOpacity!==undefined?wd.bgOpacity/100:1;
-    if(wd.bgColor.includes('gradient')){el.style.background=resolveColor(wd.bgColor)}
-    else{
-      // Apply opacity via rgba conversion
+    const resolved=resolveColor(wd.bgColor);
+    if(resolved.includes('gradient')){
+      // Apply opacity by wrapping gradient in a pseudo-overlay approach:
+      // Set the gradient as background, then use opacity on a separate bg layer
+      // Best cross-browser: set background + use CSS opacity on a child overlay
+      el.style.background=resolved;
+      if(op<1){
+        // Inject a transparent overlay div to simulate opacity
+        const ov=document.createElement('div');
+        ov.style.cssText=`position:absolute;inset:0;background:${resolved};opacity:${op};z-index:0;pointer-events:none;border-radius:inherit`;
+        el.style.background='transparent';
+        el.insertBefore(ov,el.firstChild);
+        el.dataset.gradOv='1';
+      }
+    } else {
       try{
         const r=parseInt(wd.bgColor.slice(1,3),16),g=parseInt(wd.bgColor.slice(3,5),16),b=parseInt(wd.bgColor.slice(5,7),16);
         el.style.background=`rgba(${r},${g},${b},${op})`;
@@ -1005,6 +1059,10 @@ function handleDragMove(touch){
       if(wEl){
         const r=gridToPixel(col,row,colSpan,rowSpan);
         wEl.style.left=r.x+'px';wEl.style.top=r.y+'px';wEl.style.width=r.w+'px';wEl.style.height=r.h+'px';
+        // Clamp border-radius so it doesn't over-curve on small sizes
+        const currentR=parseFloat(wEl.style.borderRadius)||12;
+        const maxR=Math.min(r.w,r.h)/2;
+        wEl.style.borderRadius=Math.min(currentR,maxR)+'px';
         wEl.style.boxShadow='0 0 0 2px var(--accent-border),0 0 20px var(--accent-glow)';
       }
     }
@@ -1096,7 +1154,8 @@ const HOTKEY_PRESETS=[
 function openWidgetEditor(wd){
   if(wd.type==='macro')openMacroEditor(wd);
   else if(wd.type==='clock')openClockEditor(wd);
-  else openStyleEditor(wd); // All other types open style editor as fallback
+  else if(['stat-cpu','stat-ram','stat-gpu','stat-net'].includes(wd.type))openStatEditor(wd);
+  else openStyleEditor(wd);
 }
 
 /* ── WIDGET STYLE EDITOR ── */
@@ -1211,6 +1270,42 @@ document.getElementById('se-radius-rst').addEventListener('click',()=>{
 document.getElementById('se-reset-style').addEventListener('click',()=>{
   SE={bgColor:'#111116',bgOpacity:100,borderColor:'#1a1a2a',borderWidth:1,shape:'default',borderRadius:12};
   openStyleEditor(SE_WD); // Re-open with defaults
+});
+
+/* ── STAT EDITOR ── */
+let STE_WD=null;
+function openStatEditor(wd){
+  STE_WD=wd;
+  const labels={'stat-cpu':'CPU','stat-ram':'RAM','stat-gpu':'GPU','stat-net':'Network'};
+  document.getElementById('ste-title').textContent=(labels[wd.type]||'Stat')+' Widget';
+  const cur=wd.sparkStyle||'bars';
+  document.querySelectorAll('#ste-spark-chips .ss-chip').forEach(c=>c.classList.toggle('on',c.dataset.sp===cur));
+  const ov=document.getElementById('stat-editor-overlay');
+  ov.style.display='block';
+  requestAnimationFrame(()=>document.getElementById('stat-editor-sheet').style.transform='translateY(0)');
+}
+function closeStatEditor(){
+  document.getElementById('stat-editor-sheet').style.transform='translateY(100%)';
+  setTimeout(()=>document.getElementById('stat-editor-overlay').style.display='none',350);
+}
+document.getElementById('ste-close').addEventListener('click',closeStatEditor);
+document.getElementById('ste-cancel').addEventListener('click',closeStatEditor);
+document.getElementById('stat-editor-backdrop').addEventListener('touchend',e=>{
+  if(e.target===document.getElementById('stat-editor-backdrop'))closeStatEditor();
+},{passive:true});
+document.querySelectorAll('#ste-spark-chips .ss-chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('#ste-spark-chips .ss-chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');
+  });
+});
+document.getElementById('ste-save').addEventListener('click',()=>{
+  if(!STE_WD)return;
+  const pg=AP().pages[AP().currentPage];if(!pg)return;
+  const w=pg.widgets.find(w=>w.id===STE_WD.id);if(!w)return;
+  const sel=document.querySelector('#ste-spark-chips .ss-chip.on');
+  if(sel)w.sparkStyle=sel.dataset.sp;
+  saveState();renderAllPages();closeStatEditor();
 });
 
 /* ── CLOCK EDITOR ── */
@@ -1597,7 +1692,12 @@ async function pollStats(){
       document.querySelectorAll('[id^="wss-net-"]').forEach(el=>{
         el.textContent='↑ '+ul+' MB/s';
       });
+      sparkPush('net',parseFloat(dl));
     }
+    if(d.cpu!==undefined)sparkPush('cpu',d.cpu.usage_pct||0);
+    if(d.ram!==undefined)sparkPush('ram',d.ram.usage_pct||0);
+    if(d.gpu!=null)sparkPush('gpu',d.gpu.usage_pct||0);
+    drawSparklines();
   }catch(_){}
 }
 
@@ -1704,7 +1804,76 @@ function showGIF(idx){
     el.innerHTML=`<img src="${url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`;
   });
 }
-// ── Demo data ──
+// ── Sparkline history (40 points each) ──
+const SPARK_HISTORY={cpu:[],ram:[],gpu:[],net:[]};
+const SPARK_MAX_PTS=40;
+
+function sparkPush(key,val){
+  SPARK_HISTORY[key].push(val);
+  if(SPARK_HISTORY[key].length>SPARK_MAX_PTS)SPARK_HISTORY[key].shift();
+}
+
+function drawSparklines(){
+  document.querySelectorAll('.w-sparkline').forEach(canvas=>{
+    const key=canvas.dataset.key;
+    const style=canvas.dataset.style||'bars';
+    const hist=SPARK_HISTORY[key];
+    if(!hist||hist.length<2)return;
+    const parent=canvas.parentElement;
+    if(!parent)return;
+    const W=parent.offsetWidth||canvas.offsetWidth||100;
+    const H=parent.offsetHeight*0.35||24;
+    canvas.width=W;canvas.height=H;
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    const lo=Math.min(...hist),hi=Math.max(...hist)||1;
+    const range=hi-lo||1;
+    const norm=v=>(v-lo)/range;
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#00D4FF';
+    ctx.strokeStyle=accent;ctx.fillStyle=accent;
+
+    if(style==='bars'){
+      const bw=Math.max(1,W/hist.length-1);
+      hist.forEach((v,i)=>{
+        const h=Math.max(1,norm(v)*H);
+        ctx.globalAlpha=.7+norm(v)*.3;
+        ctx.fillRect(i*(bw+1),H-h,bw,h);
+      });
+    } else if(style==='dots'){
+      const step=W/(hist.length-1);
+      hist.forEach((v,i)=>{
+        const x=i*step,y=H-norm(v)*H;
+        ctx.beginPath();ctx.arc(x,y,1.5,0,Math.PI*2);
+        ctx.globalAlpha=.6+norm(v)*.4;ctx.fill();
+      });
+    } else if(style==='line'||style==='gradient'){
+      const step=W/(hist.length-1);
+      ctx.beginPath();
+      hist.forEach((v,i)=>{const x=i*step,y=H-norm(v)*(H-2)-1;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
+      ctx.globalAlpha=1;ctx.lineWidth=1.5;ctx.stroke();
+      if(style==='gradient'){
+        ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();
+        const grad=ctx.createLinearGradient(0,0,0,H);
+        grad.addColorStop(0,accent+'88');grad.addColorStop(1,accent+'00');
+        ctx.fillStyle=grad;ctx.globalAlpha=1;ctx.fill();
+      }
+    } else if(style==='ekg'){
+      // EKG-style — step function
+      const step=W/(hist.length-1);
+      ctx.beginPath();
+      hist.forEach((v,i)=>{
+        const x=i*step,y=H-norm(v)*(H-2)-1;
+        if(i===0){ctx.moveTo(x,y)}else{
+          const px=(i-1)*step;ctx.lineTo(px,y);ctx.lineTo(x,y);
+        }
+      });
+      ctx.globalAlpha=1;ctx.lineWidth=1;ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  });
+}
+
+
 let DEMO_VALS={
   cpu:32, cpuTemp:58, cpuFreq:4200,
   ram:58, ramUsed:9.3, ramTotal:16,
@@ -1751,8 +1920,9 @@ function demoTick(){
   document.querySelectorAll('[id^="wss-gpu-"]').forEach(el=>el.textContent=DEMO_VALS.gpuTemp+'°C · '+DEMO_VALS.gpuVram+' GB VRAM');
   document.querySelectorAll('[id^="ws-net-"]').forEach(el=>{if(!el.id.startsWith('wss-'))el.textContent='↓ '+DEMO_VALS.dl.toFixed(1)+' MB/s'});
   document.querySelectorAll('[id^="wss-net-"]').forEach(el=>el.textContent='↑ '+DEMO_VALS.ul.toFixed(1)+' MB/s');
-
-  // Weather — cycle condition every ~30 ticks (60s)
+  sparkPush('cpu',DEMO_VALS.cpu);sparkPush('ram',DEMO_VALS.ram);
+  sparkPush('gpu',DEMO_VALS.gpu);sparkPush('net',DEMO_VALS.dl);
+  drawSparklines();
   DEMO_WX_TICK++;
   if(DEMO_WX_TICK>=30){DEMO_WX_TICK=0;DEMO_WX_IDX=(DEMO_WX_IDX+1)%DEMO_WX.length}
   const wx=DEMO_WX[DEMO_WX_IDX];
